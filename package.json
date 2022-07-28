@@ -1,5 +1,5 @@
 {
-  "name": "collections",
+  "name": "@lbagic/collections",
   "version": "1.0.0",
   "description": "Generate pinia stores with actions based on state.",
   "author": "lbagic <luka.bagi@gmail.com>",
