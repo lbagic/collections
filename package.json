@@ -1,0 +1,33 @@
+{
+  "name": "collections",
+  "version": "1.0.0",
+  "description": "Generate pinia stores with actions based on state.",
+  "author": "lbagic <luka.bagi@gmail.com>",
+  "license": "ISC",
+  "homepage": "https://github.com/lbagic/collections#readme",
+  "bugs": {
+    "url": "https://github.com/lbagic/collections/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbagic/collections.git"
+  },
+  "keywords": [
+    "array",
+    "collection"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "tsup": "^6.2.0",
+    "typescript": "^4.7.4"
+  }
+}
