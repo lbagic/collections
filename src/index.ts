@@ -31,11 +31,27 @@ function resolveAdd(source: any[], item: any, identifier: any = 'id') {
   return [...source]
 }
 
-function add<T extends Item>(source: T[], items: T[], identifier?: Identifier<T>): T[]
 function add<T extends Item>(source: T[], item: T, identifier?: Identifier<T>): T[]
+function add<T extends Item>(source: T[], items: T[], identifier?: Identifier<T>): T[]
 function add<T extends Item>(source: T[]): (items: T[], identifier?: Identifier<T>) => T[]
 function add<T extends Item>(source: T[]): (item: T, identifier?: Identifier<T>) => T[]
 function add(...args: unknown[]): unknown {
+  return curry(resolveAdd, ...args)
+}
+
+// collection.add
+function resolveAdd2(source: any[], item: any, identifier: any = 'id') {
+  const _add = adder(source, identifier)
+  if (Array.isArray(item)) item.forEach(_add)
+  else _add(item) 
+  return [...source]
+}
+
+function add2<T extends Item>(source: T[], item: T, identifier?: Identifier<T>): T[]
+function add2<T extends Item>(source: T[], items: T[], identifier?: Identifier<T>): T[]
+function add2<T extends Item>(source: T[]): (items: T[], identifier?: Identifier<T>) => T[]
+function add2<T extends Item>(source: T[]): (item: T, identifier?: Identifier<T>) => T[]
+function add2(...args: unknown[]): unknown {
   return curry(resolveAdd, ...args)
 }
 
@@ -117,3 +133,14 @@ export const collection = {
   findOne,
   findMany
 }
+
+export const collectionCurried = {
+  add: <T extends Item>(source: T[]) => add(source),
+  remove: <T extends Item>(source: T[]) => remove(source),
+  findOne: <T extends Item>(source: T[]) => findOne(source),
+  findMany: <T extends Item>(source: T[]) => findMany(source),
+}
+
+
+const arr = [{id: 1, name: 'one'}]
+collection.add(arr)
