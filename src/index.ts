@@ -13,22 +13,34 @@ const matcher = (identifier: any, isObjectItem: boolean) => (item: any, savedIte
     Object.entries(item).every(([k, v]) => savedItem[k] === v)
     : item === savedItem[identifier]
 
+const curry = (resolveFn: any, ...args: any[]) => {
+  const source = args[0]
+  if (args.length === 1) return (item: unknown, identifier: unknown) => resolveFn(source, item, identifier ?? 'id')
+  else {
+    const item = args[1]
+    const identifier = args[2] ?? 'id'
+    return resolveFn(source, item, identifier) 
+  } 
+}
+
 // collection.add
-function add<T extends Item>(source: T[], item: T, identifier?: Identifier<T>): T[]
-function add<T extends Item>(source: T[], items: T[], identifier?: Identifier<T>): T[]
-function add(source: any[], item: any, identifier: any = 'id') {
+function resolveAdd(source: any[], item: any, identifier: any = 'id') {
   const _add = adder(source, identifier)
   if (Array.isArray(item)) item.forEach(_add)
   else _add(item) 
   return [...source]
 }
 
+function add<T extends Item>(source: T[], items: T[], identifier?: Identifier<T>): T[]
+function add<T extends Item>(source: T[], item: T, identifier?: Identifier<T>): T[]
+function add<T extends Item>(source: T[]): (items: T[], identifier?: Identifier<T>) => T[]
+function add<T extends Item>(source: T[]): (item: T, identifier?: Identifier<T>) => T[]
+function add(...args: unknown[]): unknown {
+  return curry(resolveAdd, ...args)
+}
+
 // collection.remove
-function remove<T extends Item>(source: T[], id: T[Identifier<T>], identifier?: Identifier<T>): T[]
-function remove<T extends Item>(source: T[], ids: T[Identifier<T>][], identifier?: Identifier<T>): T[]
-function remove<T extends Item>(source: T[], item: Partial<T>): T[]
-function remove<T extends Item>(source: T[], items: Partial<T>[]): T[]
-function remove(source: any[], item: any, identifier: any = 'id') {
+function resolveRemove(source: any[], item: any, identifier: any = 'id') {
   const isArray = Array.isArray(item)
   const sampleItem = isArray ? item[0] : item
   const isObjectItem = typeof sampleItem === 'object'
@@ -46,36 +58,62 @@ function remove(source: any[], item: any, identifier: any = 'id') {
   return [...source]
 }
 
+function remove<T extends Item>(source: T[], id: T[Identifier<T>], identifier?: Identifier<T>): T[]
+function remove<T extends Item>(source: T[], ids: T[Identifier<T>][], identifier?: Identifier<T>): T[]
+function remove<T extends Item>(source: T[], item: Partial<T>): T[]
+function remove<T extends Item>(source: T[], items: Partial<T>[]): T[]
+function remove<T extends Item>(source: T[]): (id: T[Identifier<T>], identifier?: Identifier<T>) => T[]
+function remove<T extends Item>(source: T[]): (ids: T[Identifier<T>][], identifier?: Identifier<T>) => T[]
+function remove<T extends Item>(source: T[]): (item: Partial<T>) => T[]
+function remove<T extends Item>(source: T[]): (items: Partial<T>[]) => T[]
+function remove(...args: unknown[]): unknown {
+  return curry(resolveRemove, ...args)
+}
+
 // collection.find
-function find<T extends Item>(source: T[], id: T[Identifier<T>], identifier?: Identifier<T>): T | undefined
-function find<T extends Item>(source: T[], item: Partial<T>): T | undefined
-function find(source: any[], item: any, identifier: any = 'id') {
+function resolveFindOne(source: any[], item: any, identifier: any = 'id') {
   const isObjectItem = typeof item === 'object'
   const match = matcher(identifier, isObjectItem)
-  return source.find(savedItem => match(item, savedItem))
+  return source.find((savedItem) => match(item, savedItem))
+}
+
+function findOne<T extends Item>(source: T[], id: T[Identifier<T>], identifier?: Identifier<T>): T | undefined
+function findOne<T extends Item>(source: T[], item: Partial<T>): T | undefined
+function findOne<T extends Item>(source: T[]):(id: T[Identifier<T>], identifier?: Identifier<T>) => T | undefined
+function findOne<T extends Item>(source: T[]):(item: Partial<T>) => T | undefined
+function findOne(...args: unknown[]): unknown {
+  return curry(resolveFindOne, ...args)
 }
 
 // collection.findMany
-function findMany<T extends Item>(source: T[], id: T[Identifier<T>], identifier?: Identifier<T>): T[]
-function findMany<T extends Item>(source: T[], ids: T[Identifier<T>][], identifier?: Identifier<T>): T[]
-function findMany<T extends Item>(source: T[], item: Partial<T>): T[]
-function findMany<T extends Item>(source: T[], items: Partial<T>[]): T[]
-function findMany(source: any[], item: any, identifier: any = 'id') {
+function resolveFindMany(source: any[], item: any, identifier: any = 'id') {
   const isArray = Array.isArray(item)
   const sampleItem = isArray ? item[0] : item
   const isObjectItem = typeof sampleItem === 'object'
   const match = matcher(identifier, isObjectItem)
 
-  return source.filter((savedItem) =>
+  return source.filter(savedItem =>
     isArray ?
       item.some((i) => match(i, savedItem))
       : match(item, savedItem)
   )
 }
 
+function findMany<T extends Item>(source: T[], id: T[Identifier<T>], identifier?: Identifier<T>): T[]
+function findMany<T extends Item>(source: T[], ids: T[Identifier<T>][], identifier?: Identifier<T>): T[]
+function findMany<T extends Item>(source: T[], item: Partial<T>): T[]
+function findMany<T extends Item>(source: T[], items: Partial<T>[]): T[]
+function findMany<T extends Item>(source: T[]): (id: T[Identifier<T>], identifier?: Identifier<T>) => T[]
+function findMany<T extends Item>(source: T[]): (ids: T[Identifier<T>][], identifier?: Identifier<T>) => T[]
+function findMany<T extends Item>(source: T[]): (item: Partial<T>) => T[]
+function findMany<T extends Item>(source: T[]): (items: Partial<T>[]) => T[]
+function findMany(...args: unknown[]): unknown {
+  return curry(resolveFindMany, ...args)
+}
+
 export const collection = {
   add,
   remove,
-  find,
+  findOne,
   findMany
 }
