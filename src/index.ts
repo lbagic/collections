@@ -7,6 +7,7 @@ const adder =
     if (index < 0) source.push(item);
     else source.splice(index, 1, item);
   };
+
 const matcher =
   (identifier: any, isObjectItem: boolean) => (item: any, savedItem: any) =>
     isObjectItem
