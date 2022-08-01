@@ -1,9 +1,8 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from "tsup";
 
-export default defineConfig((options) => ({
-  entry: options.entry || ['./src/index.ts'],
-  dts: options.dts || true,
-  format: options.format || ['esm', 'cjs'],
-  watch: options.watch || false,
+export default defineConfig({
+  entry: ["src/*.ts"],
+  format: ["cjs", "esm"],
+  dts: true,
   clean: true,
-}))
+});
