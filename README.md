@@ -8,25 +8,65 @@ Javascript collection helper methods.
 npm i @lbagic/collections
 ```
 
-## Basic usage
+## Example usage
 
 ```js
 import { collection } from "@lbagic/collections";
 
-const data = [{ id: 1, name: "One" }];
+const data = [
+  { id: 1, type: "Odd" },
+  { id: 2, type: "Odd" },
+  { id: 3, type: "Odd" },
+];
 
-collection.add(data, { id: 3, name: "One" }); // @returns modified array
-collection.remove(data, 2); // @returns modified array
-collection.findOne(data, 1); // @returns item | undefined
-collection.findMany(data, "One", "name"); // @returns item[]
+collection.add(data, [
+  { id: 2, type: "Even" },
+  { id: 4, type: "Even" },
+]);
+// @returns [
+//   { id: 1, type: "Odd" },
+//   { id: 2, type: "Even" },
+//   { id: 3, type: "Odd" }
+//   { id: 4, type: "Even" }
+// ]
+
+collection.remove(data, 4);
+collection.remove(data, { id: 4 });
+// @returns [
+//   { id: 1, type: "Odd" },
+//   { id: 2, type: "Even" },
+//   { id: 3, type: "Odd" }
+// ]
+
+collection.findOne(data, 2);
+collection.findOne(data, { id: 2 });
+// @returns { id: 2, type: "Even" }
+
+collection.findMany(data, "Odd", "type");
+collection.findMany(data, { type: "Odd" });
+// @returns [
+//   { id: 1, type: "Odd" },
+//   { id: 3, type: "Odd" }
+// ]
 ```
 
-## Function signatures
+## Documentation
 
-| Parameter  | Accepted values                                                                 |
-| ---------- | ------------------------------------------------------------------------------- |
-| source     | array of objects                                                                |
-| item       | id \| id[] \| item \| item[]                                                    |
-| identifier | object key (whose value is either boolean, string, or number), defaults to "id" |
+Source parameter expects array of objects.<br>
+Functions support curried first parameter.<br>
+Identifier defaults to `id`.
 
-All functions support curried first parameter.
+| Function | Parameters                 | Returns           | Mutates |
+| -------- | -------------------------- | ----------------- | ------- |
+| add      | source, item, identifier?  | item[]            | ✅      |
+| add      | source, items, identifier? | item[]            | ✅      |
+| remove   | source, id, identifier?    | item[]            | ✅      |
+| remove   | source, ids, identifier?   | item[]            | ✅      |
+| remove   | source, item               | item[]            | ✅      |
+| remove   | source, items              | item[]            | ✅      |
+| findOne  | source, id, identifier?    | item \| undefined | ❌      |
+| findOne  | source, item               | item \| undefined | ❌      |
+| findMany | source, id, identifier?    | item[]            | ❌      |
+| findMany | source, ids, identifier?   | item[]            | ❌      |
+| findMany | source, item               | item[]            | ❌      |
+| findMany | source, items              | item[]            | ❌      |
